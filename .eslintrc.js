@@ -1,150 +1,193 @@
 module.exports = {
+  // Environment settings specify global variables that are predefined.
   env: {
-    node: true, // Defines `node` as the environment to provide node global variables and Node.js scoping.
-    jest: true, // Defines `jest` as the environment to add all Jest testing global variables.
+    es2022: true, // Support for ECMAScript 2022 globals and syntax.
+    jest: true, // Adds Jest testing framework globals like `describe` and `it`.
+    node: true, // Enables Node.js global variables (e.g., `process`) and Node-specific rules.
   },
+
+  // `extends` specifies a list of ESLint configurations to inherit from.
   extends: [
-    'plugin:@typescript-eslint/recommended', // Extends the recommended rules from the @typescript-eslint/eslint-plugin
-    'plugin:@typescript-eslint/recommended-requiring-type-checking', // Adds type-checking rules from @typescript-eslint/eslint-plugin
-    'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors.
+    'plugin:@typescript-eslint/recommended', // Base rules for TypeScript.
+    'plugin:@typescript-eslint/recommended-requiring-type-checking', // Rules that require type information.
+    'plugin:prettier/recommended', // Integrates Prettier for auto-formatting with ESLint.
+    'plugin:jest/recommended', // Recommended Jest rules.
+    'plugin:import/errors', // Import plugin to validate correct import declarations.
+    'plugin:import/warnings', // Import plugin to give warnings for import declarations.
+    'plugin:import/typescript', // Adjust import plugin for TypeScript specifics.
+    'plugin:promise/recommended', // Recommended rules for writing Promises.
+    'plugin:jsdoc/recommended', // Recommended JSDoc rules for documentation.
   ],
-  ignorePatterns: ['.eslintrc.js'], // Ignores the ESLint config file itself from linting
-  parser: '@typescript-eslint/parser', // The parser that allows ESLint to lint TypeScript code
+
+  // Files and folders to ignore.
+  ignorePatterns: ['.eslintrc.js'], // ESLint itself will ignore this config file.
+
+  // Parser for parsing TypeScript, allowing ESLint to understand TypeScript syntax.
+  parser: '@typescript-eslint/parser',
+
+  // Configuration for the TypeScript parser.
   parserOptions: {
-    project: 'tsconfig.json', // Path to the TypeScript configuration file
-    sourceType: 'module', // Allows using import/export statements
-    tsconfigRootDir: __dirname, // Helps to find the project root
+    project: 'tsconfig.json', // Path to TypeScript config file.
+    sourceType: 'module', // ECMAScript modules mode.
+    tsconfigRootDir: './', // Root directory for relative tsconfig paths.
   },
-  plugins: ['@typescript-eslint/eslint-plugin'], // Uses the TypeScript plugin for ESLint
-  root: true, // Marks the current directory as the root of the ESLint configuration (prevents parent configurations from being used)
+
+  // List of plugins that add rules or extend functionality of ESLint.
+  plugins: [
+    '@typescript-eslint', // TypeScript plugin with specific rules.
+    'import', // Plugin to support linting of ES2015+ import/export syntax.
+    'promise', // Plugin to enforce best practices for JavaScript promises.
+    'jest', // Jest plugin to lint tests.
+    'jsdoc', // JSDoc plugin to enforce documentation rules.
+    'node', // Node plugin to enforce Node.js specific rules.
+    'prettier', // Prettier plugin to integrate code formatting issues into ESLint.
+  ],
+
+  // Indicates that this is the root configuration, and ESLint should not search further.
+  root: true,
+
+  // Rules for code linting. Each rule can have severity and specific options.
   rules: {
-    '@typescript-eslint/adjacent-overload-signatures': 'error', // Enforces that members of an overloaded function are grouped together.
-    '@typescript-eslint/consistent-type-assertions': 'error', // Enforces the use of consistent type assertions.
+    // TypeScript-specific rules
+    '@typescript-eslint/adjacent-overload-signatures': 'error', // Group overloaded methods together.
+    '@typescript-eslint/consistent-type-assertions': 'error', // Enforce consistent usage of type assertions (e.g., `<type>value`).
     '@typescript-eslint/explicit-function-return-type': [
       'error',
       {
-        allowDirectConstAssertionInArrowFunctions: true, // Allows direct const assertions in arrow functions without explicit return types.
-        allowExpressions: true, // Allows function expressions with inferred return types.
-        allowHigherOrderFunctions: true, // Allows higher-order functions with inferred return types.
-        allowTypedFunctionExpressions: true, // Allows typed function expressions with inferred return types.
+        allowDirectConstAssertionInArrowFunctions: false, // Disallow `<type>value` as return in arrow functions.
+        allowExpressions: false, // Require explicit return types on all functions.
+        allowHigherOrderFunctions: false, // Disallow inferred types on higher-order functions.
+        allowTypedFunctionExpressions: true, // Allow return type inference on typed function expressions.
       },
-    ], // Enforces explicit return types on functions and class methods.
+    ], // Require explicit return types on functions and methods.
     '@typescript-eslint/explicit-member-accessibility': [
       'error',
       {
-        accessibility: 'explicit', // Requires explicit accessibility modifiers on class members.
+        accessibility: 'explicit', // Enforce explicit access modifiers on class members.
         overrides: {
-          constructors: 'no-public', // Does not require public modifiers on constructors.
+          accessors: 'explicit', // Enforce explicit access modifiers on accessors.
+          constructors: 'no-public', // Constructors should not have a `public` modifier.
+          methods: 'explicit', // Enforce explicit access modifiers on methods.
+          parameterProperties: 'explicit', // Enforce explicit access modifiers on parameter properties.
+          properties: 'off', // Do not enforce access modifiers on regular properties.
         },
       },
-    ], // Enforces explicit accessibility modifiers on class properties and methods.
-    '@typescript-eslint/explicit-module-boundary-types': 'error', // Enforces explicit return and argument types on exported functions' and classes' public class methods.
+    ], // Enforce explicit access modifiers on class members.
+    '@typescript-eslint/explicit-module-boundary-types': 'error', // Require explicit return types for exported functions and class methods.
     '@typescript-eslint/member-delimiter-style': [
       'error',
       {
         multiline: {
-          delimiter: 'semi', // Requires a semicolon at the end of multiline members.
-          requireLast: true, // Requires a delimiter at the end of the last member in multiline.
+          delimiter: 'semi', // Semicolons as delimiters in multiline type declarations.
+          requireLast: true, // Require delimiter at the end of the last member.
         },
+        multilineDetection: 'brackets', // Multiline detection using brackets.
         singleline: {
-          delimiter: 'semi', // Requires a semicolon at the end of singleline members.
-          requireLast: false, // Does not require a delimiter at the end of the last member in singleline.
+          delimiter: 'semi', // Semicolons as delimiters in singleline type declarations.
+          requireLast: false, // No delimiter required at the end of the last member in singleline.
         },
-        multilineDetection: 'brackets', // Use a semicolon as a delimiter in multiline members that have brackets.
       },
-    ], // Enforces consistent member delimiter style in interfaces and type literals.
+    ], // Enforce consistent delimiters in type declarations.
     '@typescript-eslint/naming-convention': [
       'error',
-      { format: ['camelCase'], selector: 'variableLike' }, // Enforces camelCase for variable-like declarations.
-      { format: ['PascalCase'], selector: 'typeLike' }, // Enforces PascalCase for type-like declarations.
-    ], // Enforces naming conventions for variables, classes, types, etc.
-    '@typescript-eslint/no-explicit-any': 'warn', // Warns against using the `any` type.
-    '@typescript-eslint/no-floating-promises': 'error', // Requires that promises are handled appropriately.
-    '@typescript-eslint/no-inferrable-types': 'off', // Disallows explicit type declarations for variables or parameters initialized to a number, string, or boolean.
-    '@typescript-eslint/no-non-null-assertion': 'error', // Disallows non-null assertions using the `!` postfix operator.
-    '@typescript-eslint/no-unused-vars': 'off', // Disables the rule for no unused variables.
-    '@typescript-eslint/no-use-before-define': 'off', // Disallows the use of variables before they are defined.
-    '@typescript-eslint/no-var-requires': 'error', // Disallows the use of `require` statements except in import statements.
-    '@typescript-eslint/prefer-as-const': 'error', // Enforces the use of `as const` over literal type.
+      { format: ['camelCase'], selector: 'variableLike' }, // Enforce camelCase for variables and functions.
+      { format: ['PascalCase'], selector: 'typeLike' }, // Enforce PascalCase for types like interfaces and classes.
+    ], // Enforce specific casing for names.
+    '@typescript-eslint/no-explicit-any': 'error', // Disallow the `any` type to encourage more specific types.
+    '@typescript-eslint/no-floating-promises': 'error', // Require handling of promises to avoid unhandled promise rejections.
+    '@typescript-eslint/no-inferrable-types': 'off', // Allow explicit types for values with easily inferred types.
+    '@typescript-eslint/no-non-null-assertion': 'error', // Disallow non-null assertions (`!`) which can lead to unexpected null errors.
+    '@typescript-eslint/no-unused-vars': 'off', // Turn off unused variable checks, rely on TypeScript's compiler instead.
+    '@typescript-eslint/no-use-before-define': 'off', // Allow usage of variables before they are defined.
+    '@typescript-eslint/no-var-requires': 'error', // Disallow `require` statements except in import statements.
+    '@typescript-eslint/prefer-as-const': 'error', // Prefer `as const` over literal types where possible.
     '@typescript-eslint/space-before-function-paren': [
       'error',
       {
-        anonymous: 'always', // Requires a space before the parentheses of anonymous functions.
-        asyncArrow: 'always', // Requires a space before the parentheses of async arrow functions.
-        named: 'never', // Disallows a space before the parentheses of named functions.
+        anonymous: 'always', // Require a space before anonymous function parentheses.
+        asyncArrow: 'always', // Require a space before async arrow function parentheses.
+        named: 'never', // Disallow space before named function parentheses.
       },
-    ], // Enforces consistent spacing before function parentheses.
+    ], // Enforce consistent spacing before function parentheses.
     '@typescript-eslint/strict-boolean-expressions': [
       'error',
       {
-        allowAny: false, // Disallows any type in boolean expressions.
-        allowNullableBoolean: false, // Disallows nullable boolean types in boolean expressions.
-        allowNullableNumber: false, // Disallows nullable number types in boolean expressions.
-        allowNullableObject: false, // Disallows nullable object types in boolean expressions.
-        allowNullableString: false, // Disallows nullable string types in boolean expressions.
-        allowNumber: false, // Disallows number types in boolean expressions.
-        allowString: false, // Disallows string types in boolean expressions.
-        allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false, // Allows the rule to run without strict null checks if the user knows what they are doing.
+        allowNullableObject: true, // Allow nullable objects in boolean expressions.
+        allowNumber: true, // Allow numbers in boolean expressions.
+        allowString: true, // Allow strings in boolean expressions.
       },
-    ], // Enforces strict boolean expressions.
+    ], // Enforce strict conditions in boolean expressions.
     '@typescript-eslint/typedef': [
       'error',
       {
-        arrayDestructuring: true, // Requires explicit types for array destructuring.
-        arrowParameter: true, // Requires explicit types for parameters in arrow functions.
-        memberVariableDeclaration: true, // Requires explicit types for member variable declarations.
-        objectDestructuring: true, // Requires explicit types for object destructuring.
-        parameter: true, // Requires explicit types for parameters in functions and methods.
-        propertyDeclaration: true, // Requires explicit types for property declarations.
-        variableDeclaration: true, // Requires explicit types for variable declarations.
-        variableDeclarationIgnoreFunction: false, // Does not ignore functions in variable declarations.
+        arrayDestructuring: true, // Require types on array destructuring.
+        arrowParameter: true, // Require types on arrow function parameters.
+        memberVariableDeclaration: true, // Require types on class member variables.
+        objectDestructuring: true, // Require types on object destructuring.
+        parameter: true, // Require types on all function parameters.
+        propertyDeclaration: true, // Require types on property declarations.
+        variableDeclaration: true, // Require types on variable declarations.
+        variableDeclarationIgnoreFunction: false, // Include function variables in the type requirement.
       },
-    ], // Enforces explicit type definitions for variables and members.
-    'import/no-unresolved': 'error', // Ensures all imported modules can be resolved to actual modules/files.
+    ], // Enforce explicit type definitions where needed.
+
+    // Import plugin rules
+    'import/no-unresolved': 'error', // Ensure all imports point to a file/module that can be resolved.
     'import/order': [
       'error',
       {
-        alphabetize: { caseInsensitive: false, order: 'asc' }, // Requires imports to be alphabetized.
-        groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']], // Specifies the order of import groups.
-        'newlines-between': 'always', // Requires new lines between import groups.
+        alphabetize: { caseInsensitive: false, order: 'asc' }, // Alphabetize imports.
+        groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index']], // Specify group order for import statements.
+        'newlines-between': 'always', // Enforce new lines between import groups.
         pathGroups: [
           {
             group: 'external',
-            pattern: '@nestjs/**', // Custom group for NestJS modules.
-            position: 'before', // Place NestJS imports before other external imports.
+            pattern: '@nestjs/**', // Specific pattern for NestJS modules.
+            position: 'before', // Position these before other external modules.
           },
           {
             group: 'internal',
-            pattern: '@app/**', // Custom group for app-specific aliases.
+            pattern: '@app/**', // Specific pattern for internal path aliases.
           },
         ],
-        pathGroupsExcludedImportTypes: ['builtin'], // Excludes built-in types from path groups.
+        pathGroupsExcludedImportTypes: ['builtin'], // Exclude built-in types from path groups.
       },
-    ], // Enforces a convention in the order of require()/import statements.
-    'jsdoc/check-alignment': 'error', // Ensures JSDoc comments are aligned.
-    'jsdoc/check-indentation': 'error', // Ensures JSDoc comments are properly indented.
-    'no-console': 'warn', // Warns or errors on console statements depending on the environment.
-    'no-process-exit': 'error', // Disallows the use of `process.exit()`.
-    'no-undef': 'off', // Turned off because TypeScript handles undefined variables.
-    'no-unused-vars': 'off', // Turned off because @typescript-eslint/no-unused-vars is used instead.
+    ], // Enforce a consistent order for module imports.
+
+    // JSDoc rules
+    'jsdoc/check-alignment': 'error', // Ensure JSDoc comments are aligned properly.
+    'jsdoc/check-indentation': 'error', // Ensure JSDoc comments are indented consistently.
+
+    // Other JavaScript rules
+    'no-console': 'error', // Disallow the use of `console` statements in the code.
+    'no-process-exit': 'error', // Disallow the use of `process.exit()` in Node.js.
+
+    // Prettier rules
     'prettier/prettier': [
       'error',
       {},
       {
-        usePrettierrc: true, // Use Prettier options from .prettierrc.
+        usePrettierrc: true, // Use the Prettier config file for formatting options.
       },
-    ], // Runs Prettier as an ESLint rule and reports differences as individual ESLint issues.
-    'promise/catch-or-return': 'error', // Ensures each promise has a catch() or return.
-    'promise/no-callback-in-promise': 'error', // Avoids combining callbacks and promises.
-    'promise/no-nesting': 'warn', // Avoids nested promises (`.then` inside another `.then`).
-    'promise/no-promise-in-callback': 'error', // Avoids using promises inside of callbacks.
-    'promise/param-names': 'error', // Ensures promise parameters are named `resolve` and `reject`.
+    ], // Run Prettier as an ESLint rule and report differences.
+
+    // Promise plugin rules
+    'promise/catch-or-return': 'error', // Ensure promises either have a `catch` or `return`.
+    'promise/no-callback-in-promise': 'error', // Avoid callbacks inside promises to prevent unexpected behavior.
+    'promise/no-nesting': 'warn', // Warn against nesting promises unnecessarily.
+    'promise/no-promise-in-callback': 'error', // Avoid using promises inside callbacks.
+    'promise/param-names': 'error', // Ensure promise parameters are named `resolve` and `reject`.
   },
+
+  // Additional settings for ESLint plugins and integrations.
   settings: {
     'import/resolver': {
+      node: {
+        extensions: ['.ts'], // Resolve `.ts` files for imports.
+      },
       typescript: {
-        alwaysTryTypes: true, // Tries to resolve types under `<root>@types` if this is set.
-        project: './tsconfig.json', // Path to the TypeScript config to use.
+        alwaysTryTypes: true, // Try to resolve types for TypeScript imports.
+        project: './tsconfig.json', // Path to TypeScript config for the resolver.
       },
     },
   },
