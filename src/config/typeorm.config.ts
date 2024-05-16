@@ -11,7 +11,7 @@ export const getTypeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
     username: config.get<string>('DB_USERNAME', ''),
     password: config.get<string>('DB_PASSWORD', ''),
     database: config.get<string>('DB_NAME', ''),
-    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    autoLoadEntities: true,
     synchronize: true,
   }),
 };

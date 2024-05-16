@@ -11,9 +11,8 @@
     "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
     "incremental": true, // Enable incremental compilation by creating a '.tsbuildinfo' file
     "lib": ["ES2022"], // List of library files to be included in the compilation
-    "module": "ES2022", // Specify module code generation method
+    "module": "commonjs", // Specify module code generation method
     "moduleResolution": "node", // Choose a module resolution strategy
-    "noEmitOnError": true, // Do not emit outputs if any errors were reported
     "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statements
     "noImplicitAny": true, // Raise error on expressions and declarations with an implied 'any' type
     "noImplicitOverride": true, // Ensure overriding members in derived classes are marked with an 'override' modifier
